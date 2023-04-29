@@ -65,6 +65,7 @@ type ChatCompletionResponse struct {
 func (c *Client) CreateChatCompletion(
 	ctx context.Context,
 	request ChatCompletionRequest,
+	optionalHeader ...map[string]string,
 ) (response ChatCompletionResponse, err error) {
 	if request.Stream {
 		err = ErrChatCompletionStreamNotSupported
@@ -78,6 +79,13 @@ func (c *Client) CreateChatCompletion(
 	}
 
 	req, err := c.requestBuilder.build(ctx, http.MethodPost, c.fullURL(urlSuffix), request)
+
+	for _, v := range optionalHeader {
+		for key, value := range v {
+			req.Header.Set(key, value)
+		}
+	}
+
 	if err != nil {
 		return
 	}
